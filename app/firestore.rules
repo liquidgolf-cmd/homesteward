@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users: each user can read/write their own doc (stores agentId for team support)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    // Agents: only the agent (or a user whose users/{uid}.agentId == agentId) can read/write
+    match /agents/{agentId} {
+      allow read, write: if request.auth != null && (
+        request.auth.uid == agentId ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+      );
+      match /homeowners/{homeownerId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /properties/{propertyId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /transactions/{transactionId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /touchpoints/{touchpointId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /triggers/{triggerId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /lookup_events/{eventId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+      match /billing_addon_packs/{packId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == agentId ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == agentId)
+        );
+      }
+    }
+    // Audit logs: agents can only create; read by agentId (for compliance)
+    match /auditLogs/{logId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && resource.data.agentId == request.auth.uid
+        || request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.agentId == resource.data.agentId;
+      allow update, delete: if false;
+    }
+  }
+}
