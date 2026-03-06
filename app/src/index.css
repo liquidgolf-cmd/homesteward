@@ -1,6 +1,26 @@
 @import "./styles/tokens.css";
 @import "tailwindcss";
 
+/* Tailwind v4: map design tokens to utilities (v4 ignores theme in tailwind.config.js) */
+@theme {
+  --color-yellow: var(--yellow);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dim: var(--gold-dim);
+  --color-navy: var(--navy);
+  --color-navy-mid: var(--navy-mid);
+  --color-navy-light: var(--navy-light);
+  --color-navy-card: var(--navy-card);
+  --color-navy-hover: var(--navy-hover);
+  --color-slate: var(--slate);
+  --color-slate-dim: var(--slate-dim);
+  --color-white: var(--white);
+  --color-white-dim: var(--white-dim);
+  --color-green: var(--green);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+}
+
 body {
   background: var(--navy);
   color: var(--white);
