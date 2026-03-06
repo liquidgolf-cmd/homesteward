@@ -1,21 +1,31 @@
-/* Home Steward design tokens */
+/* Home Steward design tokens — style guide */
 :root {
+  /* Backgrounds */
   --navy: #0b1522;
   --navy-mid: #0f1d2e;
   --navy-light: #162236;
   --navy-card: #18273d;
   --navy-hover: #1e3050;
+
+  /* Accent: yellow/gold (primary brand, CTAs, active states, tags) */
+  --yellow: #c9a84c;
   --gold: #c9a84c;
   --gold-light: #dfc070;
   --gold-dim: #8a6d2e;
   --gold-glow: rgba(201, 168, 76, 0.12);
+
+  /* Neutrals */
   --slate: #7a90a8;
   --slate-dim: #3d556a;
   --white: #f2efe9;
   --white-dim: #b0ada6;
+
+  /* Semantic */
   --green: #3eb489;
   --amber: #d4924a;
   --red: #c05050;
+
+  /* Borders */
   --border: rgba(201, 168, 76, 0.13);
   --border-soft: rgba(255, 255, 255, 0.05);
 }

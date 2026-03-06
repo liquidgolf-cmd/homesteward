@@ -15,6 +15,7 @@ export default {
           card: 'var(--navy-card)',
           hover: 'var(--navy-hover)',
         },
+        yellow: 'var(--yellow)',
         gold: {
           DEFAULT: 'var(--gold)',
           light: 'var(--gold-light)',
