@@ -2,13 +2,26 @@ import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
-// Trim and validate: API key must be exactly from Firebase Console (starts with AIza, no placeholder text)
+// Trim and validate: API key must be ONLY the key from Firebase (starts with AIzaSy, ~39 chars, no placeholder text)
 const rawKey = import.meta.env.VITE_FIREBASE_API_KEY
-const apiKey = typeof rawKey === 'string' ? rawKey.trim() : ''
-if (!apiKey || !apiKey.startsWith('AIza') || apiKey.length < 35 || /your|\.\.\.|example/i.test(apiKey)) {
-  console.error(
-    'Firebase API key invalid. In .env set VITE_FIREBASE_API_KEY to ONLY the key from Firebase Console → Project settings → Your apps → Web app (e.g. AIzaSy...). No quotes, no "your-key" or other text.'
-  )
+let apiKey = typeof rawKey === 'string' ? rawKey.trim() : ''
+const hasPlaceholder = /your|\.\.\.|example|your-key/i.test(apiKey)
+const hasDuplicateKey = (apiKey.match(/AIza/g) || []).length > 1
+const wrongLength = apiKey.length < 35 || apiKey.length > 45
+if (!apiKey || !apiKey.startsWith('AIzaSy') || wrongLength || hasPlaceholder || hasDuplicateKey) {
+  if (apiKey && (hasPlaceholder || hasDuplicateKey)) {
+    console.error(
+      '[Firebase] Your VITE_FIREBASE_API_KEY looks like it has extra text (e.g. "your-key" or the key pasted twice). ' +
+      'It must be ONLY the key: open Firebase Console → Project settings → Your apps → Web app → copy "API key". ' +
+      'Paste nothing else — no quotes, no "key=", no other words. The key is about 39 characters and starts with AIzaSy.'
+    )
+    apiKey = '' // Don't send malformed key to Firebase
+  } else if (!apiKey || !apiKey.startsWith('AIzaSy')) {
+    console.error(
+      '[Firebase] Missing or invalid API key. In .env set VITE_FIREBASE_API_KEY to ONLY the key from Firebase Console (starts with AIzaSy, ~39 chars). No quotes, no extra text.'
+    )
+    apiKey = ''
+  }
 }
 
 const authDomain = (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '').trim()
