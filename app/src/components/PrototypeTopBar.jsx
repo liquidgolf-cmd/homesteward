@@ -11,7 +11,7 @@ export default function PrototypeTopBar({ activeTab, onTabChange }) {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between gap-4 px-4 py-3 bg-[rgba(8,14,22,0.98)] border-b border-[rgba(201,168,76,0.2)] flex-wrap">
       <div className="flex items-center gap-3">
-        <span className="font-heading text-base font-medium text-gold-light tracking-wide whitespace-nowrap">
+        <span className="font-heading text-base font-medium text-yellow tracking-wide whitespace-nowrap">
           Home Steward
         </span>
         <span className="w-px h-4 bg-slate-dim shrink-0" />
@@ -26,7 +26,7 @@ export default function PrototypeTopBar({ activeTab, onTabChange }) {
             onClick={() => onTabChange(tab.id)}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap border ${
               activeTab === tab.id
-                ? 'bg-[var(--gold-glow)] border-[rgba(201,168,76,0.25)] text-gold-light'
+                ? 'bg-yellow border-yellow text-navy'
                 : 'border-transparent text-slate hover:bg-white/5 hover:text-white-dim'
             }`}
           >

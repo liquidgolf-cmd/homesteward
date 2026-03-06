@@ -87,22 +87,22 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(201,168,76,0.25)] transition-colors relative overflow-hidden">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Households Under Care</div>
-          <div className="font-heading text-3xl font-normal text-white mt-1">{loading ? '…' : count}</div>
+          <div className="font-heading text-3xl font-normal text-yellow mt-1">{loading ? '…' : count}</div>
           <div className="text-xs text-slate mt-1">across your portfolio</div>
         </div>
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(255,255,255,0.08)] transition-colors">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Touchpoints This Quarter</div>
-          <div className="text-2xl font-medium text-white mt-1">{tpCount}</div>
+          <div className="text-2xl font-medium text-yellow mt-1">{tpCount}</div>
           <div className="text-xs text-slate mt-1">meaningful outreaches</div>
         </div>
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(255,255,255,0.08)] transition-colors">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Priority Triggers</div>
-          <div className="text-2xl font-medium text-white mt-1">—</div>
+          <div className="text-2xl font-medium text-yellow mt-1">—</div>
           <div className="text-xs text-slate mt-1">Coming in Phase 2</div>
         </div>
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(255,255,255,0.08)] transition-colors">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Entering 5–7 Yr Window</div>
-          <div className="text-2xl font-medium text-white mt-1">—</div>
+          <div className="text-2xl font-medium text-yellow mt-1">—</div>
           <div className="text-xs text-slate mt-1">clients flagged</div>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 rounded-xl bg-navy-card border border-[var(--border)] overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-soft)]">
             <span className="text-sm font-medium text-white">Touchpoint Queue</span>
-            <Link to="/touchpoints" className="text-xs text-gold hover:text-gold-light no-underline transition-colors">
+            <Link to="/touchpoints" className="text-xs text-yellow hover:text-gold-light no-underline transition-colors">
               View all →
             </Link>
           </div>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                     </div>
                     <Link
                       to="/touchpoints/compose"
-                      className="shrink-0 px-3 py-1.5 rounded-lg border border-[var(--border)] text-xs font-medium text-slate hover:bg-[var(--gold-glow)] hover:border-gold-dim hover:text-gold-light transition-all no-underline"
+                      className="shrink-0 px-3 py-1.5 rounded-lg bg-yellow border border-yellow text-xs font-medium text-navy hover:bg-gold-light hover:border-gold-light transition-all no-underline"
                     >
                       Review & Send
                     </Link>
@@ -172,13 +172,13 @@ export default function Dashboard() {
           <div className="rounded-xl bg-navy-card border border-[var(--border)] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-soft)]">
               <span className="text-sm font-medium text-white">Value Updates</span>
-              <Link to="/avm-meter" className="text-xs text-gold hover:text-gold-light no-underline transition-colors">
+              <Link to="/avm-meter" className="text-xs text-yellow hover:text-gold-light no-underline transition-colors">
                 Details →
               </Link>
             </div>
             <div className="p-5">
               <div className="text-center">
-                <div className="font-heading text-[28px] font-normal text-white leading-none">{avmUsed ?? 0}</div>
+                <div className="font-heading text-[28px] font-normal text-yellow leading-none">{avmUsed ?? 0}</div>
                 <div className="text-[10px] text-slate tracking-wider uppercase mt-0.5">of {avmQuota ?? 300}</div>
               </div>
               <div className="mt-3 h-1.5 bg-navy-light rounded overflow-hidden">
@@ -213,7 +213,7 @@ export default function Dashboard() {
           <div className="rounded-xl bg-navy-card border border-[var(--border)] overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-soft)]">
               <span className="text-sm font-medium text-white">Priority Triggers</span>
-              <Link to="/triggers" className="text-xs text-gold hover:text-gold-light no-underline transition-colors">
+              <Link to="/triggers" className="text-xs text-yellow hover:text-gold-light no-underline transition-colors">
                 All triggers →
               </Link>
             </div>

@@ -1,0 +1,14 @@
+---
+description: After making code changes, always push to GitHub so Vercel deploys
+alwaysApply: true
+---
+
+# Push to Vercel After Changes
+
+When you have finished making code changes to this project:
+
+1. **Stage** all modified and new files (respect .gitignore; never commit `.env` or secrets).
+2. **Commit** with a clear, short message describing the change.
+3. **Push** to `origin main`: `git push origin main`.
+
+The project is connected to Vercel via GitHub (`liquidgolf-cmd/homesteward`). Pushing to `main` triggers a new deployment. Do this as the final step after any edit session so the user sees updates on the live site.

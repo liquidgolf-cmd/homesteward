@@ -70,7 +70,7 @@ export default function Landing() {
               <span className="w-6 h-px bg-gold" /> For Solo Real Estate Agents
             </p>
             <h1 className="font-heading text-5xl md:text-[64px] font-normal leading-[1.05] text-white mb-6">
-              Never let a <em className="italic font-light text-gold-light">meaningful relationship</em> go quiet.
+              Never let a <em className="italic font-light text-yellow">meaningful relationship</em> go quiet.
             </h1>
             <p className="text-base text-slate font-light leading-relaxed max-w-[460px] mb-10">
               A simple, agent-branded system that organizes your past clients, surfaces the moments that matter, and helps you stay present — without adding work.
@@ -88,17 +88,17 @@ export default function Landing() {
             </div>
             <div className="flex items-center gap-5 mt-10 pt-8 border-t border-[var(--border-soft)]">
               <div className="flex flex-col">
-                <span className="font-heading text-2xl font-normal text-gold-light">187</span>
+                <span className="font-heading text-2xl font-normal text-yellow">187</span>
                 <span className="text-[11px] text-slate-dim uppercase tracking-wider">avg clients managed</span>
               </div>
               <div className="w-px h-9 bg-[var(--border)]" />
               <div className="flex flex-col">
-                <span className="font-heading text-2xl font-normal text-gold-light">4×</span>
+                <span className="font-heading text-2xl font-normal text-yellow">4×</span>
                 <span className="text-[11px] text-slate-dim uppercase tracking-wider">more referral contact</span>
               </div>
               <div className="w-px h-9 bg-[var(--border)]" />
               <div className="flex flex-col">
-                <span className="font-heading text-2xl font-normal text-gold-light">30 days</span>
+                <span className="font-heading text-2xl font-normal text-yellow">30 days</span>
                 <span className="text-[11px] text-slate-dim uppercase tracking-wider">free pilot period</span>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function Landing() {
                 <span className="w-5 h-px bg-gold" /> The reality
               </p>
               <h2 className="font-heading text-4xl md:text-[48px] font-normal leading-tight text-white mb-5">
-                Most agents lose touch with <em className="italic text-gold-light">90% of past clients</em> within two years.
+                Most agents lose touch with <em className="italic text-yellow">90% of past clients</em> within two years.
               </h2>
               <p className="text-[15px] text-slate font-light leading-relaxed mb-6">
                 Without a system, your database goes cold. Home Steward turns your closed transactions into a living relationship map — so you're there when they're ready to move again.
@@ -126,21 +126,21 @@ export default function Landing() {
             </div>
             <div className="space-y-0">
               <div className="flex gap-7 py-6 border-b border-[var(--border-soft)]">
-                <span className="font-heading text-5xl font-light text-gold shrink-0">71%</span>
+                <span className="font-heading text-5xl font-light text-yellow shrink-0">71%</span>
                 <div>
                   <div className="text-[15px] font-medium text-white mb-1">of referrals come from past clients</div>
                   <div className="text-[13px] text-slate font-light leading-relaxed">Staying in touch is the single highest-leverage activity for repeat and referral business.</div>
                 </div>
               </div>
               <div className="flex gap-7 py-6 border-b border-[var(--border-soft)]">
-                <span className="font-heading text-5xl font-light text-gold shrink-0">5–7</span>
+                <span className="font-heading text-5xl font-light text-yellow shrink-0">5–7</span>
                 <div>
                   <div className="text-[15px] font-medium text-white mb-1">years: peak move-intent window</div>
                   <div className="text-[13px] text-slate font-light leading-relaxed">Ownership year 5–7 is when homeowners are most likely to consider a change. We flag them for you.</div>
                 </div>
               </div>
               <div className="flex gap-7 py-6">
-                <span className="font-heading text-5xl font-light text-gold shrink-0">1</span>
+                <span className="font-heading text-5xl font-light text-yellow shrink-0">1</span>
                 <div>
                   <div className="text-[15px] font-medium text-white mb-1">agent at the center</div>
                   <div className="text-[13px] text-slate font-light leading-relaxed">Every touchpoint is from you. Your brand, your voice, your relationship. We're the invisible infrastructure.</div>
@@ -172,7 +172,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-12 border-t border-[var(--border-soft)]">
         <div className="max-w-[1200px] mx-auto px-6 md:px-15 flex flex-wrap items-center justify-between gap-4">
-          <div className="font-heading text-lg font-medium text-gold-light">Home Steward</div>
+          <div className="font-heading text-lg font-medium text-yellow">Home Steward</div>
           <div className="flex gap-8 text-[12px] text-slate-dim">
             <a href="/privacy" className="no-underline hover:text-gold transition-colors">Privacy</a>
             <a href="/terms" className="no-underline hover:text-gold transition-colors">Terms</a>
