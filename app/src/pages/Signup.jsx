@@ -19,26 +19,48 @@ export default function Signup() {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
       const agentId = user.uid
-      await setDoc(doc(db, 'users', user.uid), { agentId, email, displayName: name })
-      const agentRef = doc(db, 'agents', agentId)
-      const existing = await getDoc(agentRef)
-      if (!existing.exists()) {
-        await setDoc(agentRef, {
-          name: name || email,
-          email,
-          subscriptionTier: 'starter',
-          avmQuota: 300,
-          avmPeriodStart: new Date().toISOString().slice(0, 10),
-          avmUsed: 0,
-          avmAddonRemaining: 0,
-          autoTopupEnabled: false,
-          createdAt: new Date().toISOString(),
-          preferences: { defaultCadence: 'quarterly' },
-        })
+
+      // Firestore writes with timeout so we don't spin forever
+      const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out. Check that Firestore is created and rules are deployed.')), ms))
+
+      try {
+        await Promise.race([
+          (async () => {
+            await setDoc(doc(db, 'users', user.uid), { agentId, email, displayName: name })
+            const agentRef = doc(db, 'agents', agentId)
+            const existing = await getDoc(agentRef)
+            if (!existing.exists()) {
+              await setDoc(agentRef, {
+                name: name || email,
+                email,
+                subscriptionTier: 'starter',
+                avmQuota: 300,
+                avmPeriodStart: new Date().toISOString().slice(0, 10),
+                avmUsed: 0,
+                avmAddonRemaining: 0,
+                autoTopupEnabled: false,
+                createdAt: new Date().toISOString(),
+                preferences: { defaultCadence: 'quarterly' },
+              })
+            }
+          })(),
+          timeout(15000),
+        ])
+      } catch (firestoreErr) {
+        console.error('Firestore signup write failed:', firestoreErr)
+        setError(firestoreErr.message || 'Account created but profile setup failed. Try signing in.')
+        setLoading(false)
+        return
       }
+
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Sign up failed. Try again.')
+      console.error('Signup error:', err)
+      if (err.code === 'auth/email-already-in-use') {
+        setError('This email is already registered. Sign in instead.')
+      } else {
+        setError(err.message || 'Sign up failed. Try again.')
+      }
     } finally {
       setLoading(false)
     }

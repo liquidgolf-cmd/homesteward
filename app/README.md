@@ -4,20 +4,22 @@ Phase 1 implementation: agent auth, dashboard, add homeowner, CSV import with co
 
 ## Setup (add your APIs and database last)
 
-1. **Firebase**
-   - Create a project at [Firebase Console](https://console.firebase.google.com).
-   - Enable **Authentication** (Email/Password).
-   - Create a **Firestore** database.
-   - In Project settings, copy your app config and add it to a `.env` file in this directory:
+1. **Firebase (realestatebuddy2)**
+   - Use the **realestatebuddy2** project in [Firebase Console](https://console.firebase.google.com).
+   - Project settings (gear) → Your apps → select your Web app → copy the config.
+   - Enable **Authentication** → Sign-in method → Email/Password (and Google if using the client ID below).
+   - Create a **Firestore** database if needed.
+   - Add the config to a `.env` file in this directory:
 
    ```
-   VITE_FIREBASE_API_KEY=your-api-key
-   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your-project-id
-   VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-   VITE_FIREBASE_APP_ID=your-app-id
+   VITE_FIREBASE_API_KEY=<from config>
+   VITE_FIREBASE_AUTH_DOMAIN=<from config>
+   VITE_FIREBASE_PROJECT_ID=<from config>
+   VITE_FIREBASE_STORAGE_BUCKET=<from config>
+   VITE_FIREBASE_MESSAGING_SENDER_ID=<from config>
+   VITE_FIREBASE_APP_ID=<from config>
    ```
+   - For Google Sign-In (optional): use OAuth client `78503199798-qb20mnaofjbd3ii210gq8omo2ou9bmpp.apps.googleusercontent.com` in Firebase Auth → Sign-in method → Google.
 
    - Deploy Firestore rules (from this repo):
      ```bash

@@ -53,11 +53,11 @@ export default function Sidebar() {
   return (
     <aside className="flex flex-col w-[240px] shrink-0 h-full bg-navy-mid border-r border-[var(--border)] overflow-hidden">
       <div className="px-6 pt-7 pb-6 border-b border-[var(--border)]">
-        <div className="font-heading text-[22px] font-medium tracking-wide text-gold-light leading-tight">
+        <div className="font-heading text-[22px] font-medium tracking-wide text-white leading-tight">
           Home Steward
         </div>
         <div className="text-[10px] tracking-[0.18em] uppercase text-slate mt-1">
-          Client Relationship OS
+          CLIENT RELATIONSHIP OS
         </div>
       </div>
 

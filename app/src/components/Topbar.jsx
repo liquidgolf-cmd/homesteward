@@ -45,8 +45,8 @@ export default function Topbar() {
               style={{ width: `${Math.min(100, (avmUsed ?? 0) / (avmQuota || 300) * 100)}%` }}
             />
           </span>
-          <span className="text-xs font-medium text-gold-light">
-            {avmUsed ?? 0}/{avmQuota ?? 300}
+          <span className="text-xs font-medium text-white">
+            {avmUsed ?? 0} / {avmQuota ?? 300}
           </span>
         </Link>
         <button
