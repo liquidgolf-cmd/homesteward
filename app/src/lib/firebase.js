@@ -2,13 +2,16 @@ import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
-// Trim only; log a warning if key looks wrong but never overwrite (so we don't break a working setup)
+// Use API key as-is; if env has extra text (e.g. "your-k" or pasted twice), extract the real key
 const rawKey = import.meta.env.VITE_FIREBASE_API_KEY
-const apiKey = typeof rawKey === 'string' ? rawKey.trim() : ''
-if (!apiKey || !apiKey.startsWith('AIza') || /your|\.\.\.|example/i.test(apiKey)) {
-  console.warn(
-    '[Firebase] API key missing or looks invalid. If sign-in fails, set VITE_FIREBASE_API_KEY in .env (and Vercel) to ONLY the key from Firebase Console.'
-  )
+let apiKey = typeof rawKey === 'string' ? rawKey.trim() : ''
+// Firebase web keys are AIzaSy + 33 chars; extract if buried in placeholder text
+const keyMatch = apiKey.match(/AIzaSy[A-Za-z0-9_-]{33}/)
+if (keyMatch) {
+  apiKey = keyMatch[0]
+}
+if (!apiKey) {
+  console.warn('[Firebase] No valid API key found. Set VITE_FIREBASE_API_KEY in .env and Vercel to the key from Firebase Console.')
 }
 
 const authDomain = (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '').trim()
