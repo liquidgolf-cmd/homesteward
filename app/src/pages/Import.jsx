@@ -72,9 +72,12 @@ export default function Import() {
   const [showModal, setShowModal] = useState(false)
   const [importWithEnrich, setImportWithEnrich] = useState(false)
 
-  const handleFile = useCallback((e) => {
-    const file = e.target.files?.[0]
+  const processFile = useCallback((file) => {
     if (!file) return
+    if (!file.name?.toLowerCase().endsWith('.csv') && file.type !== 'text/csv') {
+      setError('Please drop a CSV file.')
+      return
+    }
     setError('')
     const reader = new FileReader()
     reader.onload = () => {
@@ -113,6 +116,22 @@ export default function Import() {
       }
     }
     reader.readAsText(file, 'UTF-8')
+  }, [])
+
+  const handleFile = useCallback((e) => {
+    processFile(e.target.files?.[0])
+  }, [processFile])
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const file = e.dataTransfer?.files?.[0]
+    processFile(file)
+  }, [processFile])
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
   }, [])
 
   const uniqueProperties = () => {
@@ -276,7 +295,11 @@ export default function Import() {
             {error}
           </p>
         )}
-        <label className="block rounded-2xl border border-dashed border-slate-dim bg-navy-card p-14 text-center cursor-pointer hover:border-gold-dim hover:bg-navy-hover transition-all relative overflow-hidden mb-5">
+        <label
+          className="block rounded-2xl border border-dashed border-slate-dim bg-navy-card p-14 text-center cursor-pointer hover:border-gold-dim hover:bg-navy-hover transition-all relative overflow-hidden mb-5"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+        >
           <span className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--gold-glow),transparent_70%)] opacity-0 hover:opacity-100 transition-opacity pointer-events-none" />
           <input type="file" accept=".csv,text/csv" className="sr-only" onChange={handleFile} />
           <span className="text-4xl block mb-4">📄</span>
