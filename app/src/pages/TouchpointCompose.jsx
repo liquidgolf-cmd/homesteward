@@ -1,8 +1,29 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 
 const PREFILL = `Quick note — homes near your area saw a small uptick this quarter. If you're curious what that means for yours, I'm happy to run a quick look — no pressure.`
+
+// AI variations pool — tone-keyed templates (mock generation; no API)
+const AI_VARIATIONS = {
+  warm: [
+    `Quick note — homes near your area saw a small uptick this quarter. If you're curious what that means for yours, I'm happy to run a quick look — no pressure.`,
+    `Hope you're doing well! I noticed some movement in your neighborhood recently. Would love to catch up and share what it could mean for your home — totally no obligation.`,
+    `Just thinking of you — your area has been busy lately. If you'd like a quick snapshot of how your home stacks up, I'm here. No strings attached.`,
+    `Hi there! Neighborhood activity picked up this quarter. I'd be happy to run the numbers for you if you're curious — zero pressure, just helpful info.`,
+    `Wanted to reach out — there's been some action near you. Happy to give you a quick read on your property whenever you'd like.`,
+  ],
+  direct: [
+    `Neighborhood activity up this quarter. Your property may be affected. Happy to run a value check — reply if interested.`,
+    `Homes in your area: small uptick in activity. I can pull a quick valuation. Let me know.`,
+    `Market update for your neighborhood: movement this quarter. Want a value snapshot? Reply yes.`,
+  ],
+  brief: [
+    `Neighborhood uptick — want a quick value look? No pressure.`,
+    `Homes near you moving. Quick check available if you're curious.`,
+    `Area activity up. Happy to run numbers. LMK.`,
+  ],
+}
 
 const client = {
   name: 'Sarah Johnson',
@@ -22,6 +43,11 @@ const client = {
   trigger: '3 homes sold on her block in the last 30 days. Equity crossed 30% threshold. Ownership year 5–7 window — historically highest move-intent period.',
 }
 
+function pickVariations(pool, count = 3) {
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count)
+}
+
 export default function TouchpointCompose() {
   const { user } = useAuth()
   const [message, setMessage] = useState(PREFILL)
@@ -29,8 +55,28 @@ export default function TouchpointCompose() {
   const [tone, setTone] = useState('warm')
   const [includeLink, setIncludeLink] = useState(true)
   const [sent, setSent] = useState(false)
+  const [aiVariations, setAiVariations] = useState(() => pickVariations(AI_VARIATIONS.warm))
+  const [regenerating, setRegenerating] = useState(false)
 
   const agentName = user?.displayName || 'Mike Smith'
+
+  const handleRegenerate = useCallback(() => {
+    setRegenerating(true)
+    setTimeout(() => {
+      setAiVariations(pickVariations(AI_VARIATIONS[tone]))
+      setRegenerating(false)
+    }, 500)
+  }, [tone])
+
+  // When tone changes, refresh variations
+  const handleToneChange = (t) => {
+    setTone(t)
+    setAiVariations(pickVariations(AI_VARIATIONS[t]))
+  }
+
+  const handleUseVariation = (text) => {
+    setMessage(text)
+  }
 
   const handleSend = () => {
     setSent(true)
@@ -39,7 +85,6 @@ export default function TouchpointCompose() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message)
-      // Optional: show brief feedback
     } catch {}
   }
 
@@ -187,7 +232,7 @@ export default function TouchpointCompose() {
                 <button
                   key={t}
                   type="button"
-                  onClick={() => setTone(t)}
+                  onClick={() => handleToneChange(t)}
                   className={`px-3 py-1.5 rounded-lg border text-xs capitalize transition-colors ${
                     tone === t
                       ? 'bg-[var(--gold-glow)] border-[rgba(201,168,76,0.25)] text-gold-light'
@@ -237,23 +282,45 @@ export default function TouchpointCompose() {
             </div>
 
             <div className="mb-4">
-              <div className="text-xs text-slate-dim mb-2">AI Variations <button type="button" className="text-gold hover:text-gold-light ml-2">↻ Regenerate</button></div>
-              <p className="text-[11px] text-slate">Coming in a future release.</p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-slate-dim">AI Variations</span>
+                <button
+                  type="button"
+                  onClick={handleRegenerate}
+                  disabled={regenerating}
+                  className="text-xs text-gold hover:text-gold-light disabled:opacity-50 flex items-center gap-1"
+                >
+                  {regenerating ? '…' : '↻'} Regenerate
+                </button>
+              </div>
+              <div className="space-y-2">
+                {aiVariations.map((v, i) => (
+                  <button
+                    key={`${i}-${v.slice(0, 30)}`}
+                    type="button"
+                    onClick={() => handleUseVariation(v)}
+                    className="block w-full text-left rounded-lg bg-navy-card border border-[var(--border-soft)] px-3 py-2.5 text-[13px] text-slate hover:border-gold-dim hover:text-white-dim transition-colors"
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-slate-dim mt-2">Click a variation to use it in the message above.</p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={handleSend}
                 className="rounded-lg bg-gold px-5 py-2.5 text-sm font-medium text-navy hover:bg-gold-light hover:-translate-y-0.5"
               >
-                Send message
+                Review & Send
               </button>
               <Link
                 to="/touchpoints"
                 className="rounded-lg border border-[var(--border)] px-5 py-2.5 text-sm font-medium text-slate hover:border-gold-dim hover:text-gold no-underline"
               >
-                Cancel
+                Dismiss
               </Link>
             </div>
             {sent && (
