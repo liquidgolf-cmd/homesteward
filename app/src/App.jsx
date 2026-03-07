@@ -17,6 +17,7 @@ import Placeholder from '@/pages/Placeholder'
 import Triggers from '@/pages/Triggers'
 import Clients from '@/pages/Clients'
 import ClientDashboard from '@/pages/ClientDashboard'
+import Settings from '@/pages/Settings'
 
 export default function App() {
   return (
@@ -41,7 +42,7 @@ export default function App() {
             <Route path="clients" element={<Clients />} />
             <Route path="clients/:id" element={<ClientDashboard />} />
             <Route path="equity-map" element={<Placeholder title="Equity Map" />} />
-            <Route path="settings" element={<Placeholder title="Settings" />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
