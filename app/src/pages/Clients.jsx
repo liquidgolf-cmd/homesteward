@@ -1,13 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { collection, getDocs, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 
+function toSortableDate(d) {
+  if (!d) return ''
+  const s = typeof d === 'string' ? d : (d?.toDate?.()?.toISOString?.() || '')
+  return s || ''
+}
+
 export default function Clients() {
   const { agentId } = useAuth()
   const [homeowners, setHomeowners] = useState([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('name')
 
   useEffect(() => {
     if (!agentId) return
@@ -55,6 +63,40 @@ export default function Clients() {
     return () => { cancelled = true }
   }, [agentId])
 
+  const filteredAndSorted = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    let list = q
+      ? homeowners.filter((h) => {
+          const searchable = [h.firstName, h.lastName, h.email, h.phone, h.address].filter(Boolean).join(' ').toLowerCase()
+          return searchable.includes(q)
+        })
+      : [...homeowners]
+    const compare = (a, b) => {
+      if (sortBy === 'name' || sortBy === 'nameDesc') {
+        const nameA = [a.firstName, a.lastName].filter(Boolean).join(' ').toLowerCase()
+        const nameB = [b.firstName, b.lastName].filter(Boolean).join(' ').toLowerCase()
+        const cmp = nameA.localeCompare(nameB)
+        return sortBy === 'nameDesc' ? -cmp : cmp
+      }
+      if (sortBy === 'closed' || sortBy === 'closedDesc') {
+        const dateA = toSortableDate(a.closingDate)
+        const dateB = toSortableDate(b.closingDate)
+        const cmp = dateA.localeCompare(dateB)
+        return sortBy === 'closedDesc' ? -cmp : cmp
+      }
+      return 0
+    }
+    list.sort(compare)
+    return list
+  }, [homeowners, searchQuery, sortBy])
+
+  const handleSortName = () => {
+    setSortBy((prev) => (prev === 'name' ? 'nameDesc' : 'name'))
+  }
+  const handleSortClosed = () => {
+    setSortBy((prev) => (prev === 'closedDesc' ? 'closed' : 'closedDesc'))
+  }
+
   const formatDate = (d) => {
     if (!d) return '—'
     const s = typeof d === 'string' ? d : (d?.toDate?.()?.toISOString?.() || '')
@@ -72,7 +114,11 @@ export default function Clients() {
         <div>
           <h1 className="font-heading text-2xl font-medium text-white">All Clients</h1>
           <p className="text-sm text-slate mt-1">
-            {loading ? 'Loading…' : `${homeowners.length} household${homeowners.length === 1 ? '' : 's'} under care`}
+            {loading
+              ? 'Loading…'
+              : searchQuery.trim()
+                ? `Showing ${filteredAndSorted.length} of ${homeowners.length} households`
+                : `${homeowners.length} household${homeowners.length === 1 ? '' : 's'} under care`}
           </p>
         </div>
         <Link
@@ -109,21 +155,55 @@ export default function Clients() {
           </div>
         </div>
       ) : (
-        <div className="rounded-xl bg-navy-card border border-[var(--border)] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[var(--border-soft)]">
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium">Name</th>
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium">Email</th>
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hidden md:table-cell">Phone</th>
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hidden lg:table-cell">Address</th>
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium">Closed</th>
-                  <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium w-24"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {homeowners.map((h) => {
+        <>
+          <div className="mb-6">
+            <input
+              type="search"
+              placeholder="Search by name, email, phone, or address"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full max-w-md rounded-lg border border-[var(--border-soft)] bg-navy-light px-4 py-2.5 text-sm text-white placeholder-slate-dim focus:border-gold-dim focus:outline-none"
+              aria-label="Search clients"
+            />
+          </div>
+          <div className="rounded-xl bg-navy-card border border-[var(--border)] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-[var(--border-soft)]">
+                    <th>
+                      <button
+                        type="button"
+                        onClick={handleSortName}
+                        className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hover:text-yellow transition-colors flex items-center gap-1"
+                      >
+                        Name {sortBy === 'name' ? '↑' : sortBy === 'nameDesc' ? '↓' : ''}
+                      </button>
+                    </th>
+                    <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium">Email</th>
+                    <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hidden md:table-cell">Phone</th>
+                    <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hidden lg:table-cell">Address</th>
+                    <th>
+                      <button
+                        type="button"
+                        onClick={handleSortClosed}
+                        className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium hover:text-yellow transition-colors flex items-center gap-1"
+                      >
+                        Closed {sortBy === 'closed' ? '↑' : sortBy === 'closedDesc' ? '↓' : ''}
+                      </button>
+                    </th>
+                    <th className="px-5 py-4 text-[10px] tracking-wider uppercase text-slate-dim font-medium w-24"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAndSorted.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-5 py-12 text-center text-slate text-sm">
+                        No clients match your search.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredAndSorted.map((h) => {
                   const name = [h.firstName, h.lastName].filter(Boolean).join(' ') || '—'
                   return (
                     <tr
@@ -149,11 +229,12 @@ export default function Clients() {
                       </td>
                     </tr>
                   )
-                })}
+                }))}
               </tbody>
             </table>
           </div>
         </div>
+        </>
       )}
     </div>
   )
