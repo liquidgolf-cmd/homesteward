@@ -307,48 +307,47 @@ export default function TouchpointCompose() {
               </div>
               <p className="text-[11px] text-slate-dim mt-2">Click a variation to use it in the message above.</p>
             </div>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={handleSend}
-                className="rounded-lg bg-gold px-5 py-2.5 text-sm font-medium text-navy hover:bg-gold-light hover:-translate-y-0.5"
-              >
-                Review & Send
-              </button>
-              <Link
-                to="/touchpoints"
-                className="rounded-lg border border-[var(--border)] px-5 py-2.5 text-sm font-medium text-slate hover:border-gold-dim hover:text-gold no-underline"
-              >
-                Dismiss
-              </Link>
-            </div>
-            {sent && (
-              <div className="mt-4 text-sm bg-amber/10 border border-amber/30 p-4 rounded-lg space-y-3">
-                <p className="text-amber">
-                  Touchpoint delivery is a mockup — no push, SMS, or email is sent. Copy the message and send it yourself.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="rounded-lg bg-gold px-4 py-2 text-sm font-medium text-navy hover:bg-gold-light"
-                >
-                  Copy to clipboard
-                </button>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Right: Preview placeholder */}
-        <div className="w-[300px] shrink-0 border-l border-[var(--border-soft)] p-4 overflow-y-auto">
-          <div className="text-[10px] tracking-wider uppercase text-slate-dim mb-2">Live Preview</div>
-          <div className="text-xs text-slate mb-2">{channel === 'push' ? 'Push Notification' : channel === 'sms' ? 'SMS' : 'Email'}</div>
-          <div className="rounded-xl bg-navy-card border border-[var(--border)] p-4">
-            <div className="text-xs text-white-dim font-medium mb-1">{agentName}</div>
-            <div className="text-[11px] text-slate line-clamp-3">{message.slice(0, 120)}{message.length > 120 ? '…' : ''}</div>
-            {includeLink && <div className="mt-2 text-[10px] text-gold">Learn more</div>}
+        {/* Right: Live Preview + Review & Send */}
+        <div className="w-[300px] shrink-0 border-l border-[var(--border-soft)] p-4 overflow-y-auto flex flex-col gap-4">
+          <div>
+            <div className="text-[10px] tracking-wider uppercase text-slate-dim mb-2">Live Preview</div>
+            <div className="text-xs text-slate mb-2">{channel === 'push' ? 'Push Notification' : channel === 'sms' ? 'SMS' : 'Email'}</div>
+            <div className="rounded-xl bg-navy-card border border-[var(--border)] p-4">
+              <div className="text-xs text-white-dim font-medium mb-1">{agentName}</div>
+              <div className="text-[11px] text-slate line-clamp-3">{message.slice(0, 120)}{message.length > 120 ? '…' : ''}</div>
+              {includeLink && <div className="mt-2 text-[10px] text-gold" title="Link to personalized value report (mockup)">Learn more</div>}
+            </div>
           </div>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={handleSend}
+              className="rounded-lg bg-gold px-4 py-2.5 text-sm font-medium text-navy hover:bg-gold-light w-full"
+            >
+              Review & Send
+            </button>
+            <Link
+              to="/touchpoints"
+              className="rounded-lg border border-[var(--border)] px-4 py-2.5 text-sm font-medium text-slate hover:border-gold-dim hover:text-gold no-underline text-center"
+            >
+              Dismiss
+            </Link>
+          </div>
+          {sent && (
+            <div className="text-sm bg-amber/10 border border-amber/30 p-3 rounded-lg space-y-2">
+              <p className="text-amber text-xs">No real delivery — copy and send yourself.</p>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="rounded-lg bg-gold px-4 py-2 text-sm font-medium text-navy hover:bg-gold-light w-full"
+              >
+                Copy to clipboard
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
