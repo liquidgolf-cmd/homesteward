@@ -36,6 +36,13 @@ export default function TouchpointCompose() {
     setSent(true)
   }
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message)
+      // Optional: show brief feedback
+    } catch {}
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Topbar: back + breadcrumb + queue pill */}
@@ -250,9 +257,18 @@ export default function TouchpointCompose() {
               </Link>
             </div>
             {sent && (
-              <p className="mt-4 text-sm text-amber bg-amber/10 border border-amber/30 p-3 rounded-lg">
-                Message sending will be available in Phase 2. For now, copy the message and send it yourself.
-              </p>
+              <div className="mt-4 text-sm bg-amber/10 border border-amber/30 p-4 rounded-lg space-y-3">
+                <p className="text-amber">
+                  Touchpoint delivery is a mockup — no push, SMS, or email is sent. Copy the message and send it yourself.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="rounded-lg bg-gold px-4 py-2 text-sm font-medium text-navy hover:bg-gold-light"
+                >
+                  Copy to clipboard
+                </button>
+              </div>
             )}
           </div>
         </div>
