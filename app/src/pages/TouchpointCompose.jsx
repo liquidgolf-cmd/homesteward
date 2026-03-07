@@ -327,7 +327,7 @@ export default function TouchpointCompose() {
               onClick={handleSend}
               className="rounded-lg bg-gold px-4 py-2.5 text-sm font-medium text-navy hover:bg-gold-light w-full"
             >
-              Review & Send
+              Send message
             </button>
             <Link
               to="/touchpoints"
