@@ -14,6 +14,7 @@ import AVMMeter from '@/pages/AVMMeter'
 import EventCreator from '@/pages/EventCreator'
 import HomeownerPortal from '@/pages/HomeownerPortal'
 import Placeholder from '@/pages/Placeholder'
+import Triggers from '@/pages/Triggers'
 import Clients from '@/pages/Clients'
 import ClientDashboard from '@/pages/ClientDashboard'
 
@@ -24,6 +25,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/portal" element={<HomeownerPortal />} />
           <Route path="/" element={<AppGate />}>
             <Route index element={<Dashboard />} />
             <Route path="onboarding" element={<Onboarding />} />
@@ -35,7 +37,7 @@ export default function App() {
             <Route path="avm-meter" element={<AVMMeter />} />
             <Route path="create-event" element={<EventCreator />} />
             <Route path="homeowner" element={<HomeownerPortal />} />
-            <Route path="triggers" element={<Placeholder title="Priority Triggers" />} />
+            <Route path="triggers" element={<Triggers />} />
             <Route path="clients" element={<Clients />} />
             <Route path="clients/:id" element={<ClientDashboard />} />
             <Route path="equity-map" element={<Placeholder title="Equity Map" />} />

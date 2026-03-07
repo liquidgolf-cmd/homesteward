@@ -223,7 +223,7 @@ export default function ClientDashboard() {
           <h1 className="font-heading text-2xl font-medium text-white">{name}</h1>
         </div>
         <Link
-          to="/touchpoints/compose"
+          to={`/touchpoints/compose?homeownerId=${id}`}
           className="inline-flex items-center justify-center rounded-lg bg-yellow px-5 py-2.5 text-sm font-medium text-navy no-underline hover:bg-gold-light transition-all shrink-0"
         >
           Touchpoint

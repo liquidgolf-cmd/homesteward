@@ -4,6 +4,7 @@ import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useAgentStats } from '@/hooks/useAgentStats'
+import { deriveSuggestedTouchpoints } from '@/lib/suggestedTouchpoints'
 
 const QUICK_ACTIONS = [
   { to: '/touchpoints', icon: '📋', label: 'Review\nTouchpoints' },
@@ -14,7 +15,7 @@ const QUICK_ACTIONS = [
 
 export default function Dashboard() {
   const { agentId } = useAuth()
-  const { homeownerCount, touchpointCount, avmUsed, avmQuota } = useAgentStats(agentId)
+  const { homeownerCount, touchpointCount, avmUsed, avmQuota, entering5to7Count, priorityTriggerCount } = useAgentStats(agentId)
   const [touchpointsPreview, setTouchpointsPreview] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -23,14 +24,21 @@ export default function Dashboard() {
     let cancelled = false
     async function load() {
       try {
-        const snap = await getDocs(
-          query(
-            collection(db, 'agents', agentId, 'touchpoints'),
-            orderBy('scheduledFor', 'asc'),
-            limit(6)
-          )
-        )
-        if (!cancelled) setTouchpointsPreview(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+        const [tpSnap, homeSnap, txSnap] = await Promise.all([
+          getDocs(query(collection(db, 'agents', agentId, 'touchpoints'), orderBy('scheduledFor', 'asc'), limit(6))),
+          getDocs(query(collection(db, 'agents', agentId, 'homeowners'), orderBy('createdAt', 'desc'))),
+          getDocs(collection(db, 'agents', agentId, 'transactions')),
+        ])
+        if (cancelled) return
+        const tpDocs = tpSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        if (tpDocs.length > 0) {
+          setTouchpointsPreview(tpDocs)
+        } else {
+          const homeowners = homeSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+          const transactions = txSnap.docs.map((d) => ({ ...d.data(), homeownerId: d.data().homeownerId }))
+          const suggested = deriveSuggestedTouchpoints(homeowners, transactions)
+          setTouchpointsPreview(suggested.slice(0, 6))
+        }
       } catch {
         if (!cancelled) setTouchpointsPreview([])
       } finally {
@@ -97,12 +105,12 @@ export default function Dashboard() {
         </div>
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(255,255,255,0.08)] transition-colors">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Priority Triggers</div>
-          <div className="text-2xl font-medium text-yellow mt-1">—</div>
-          <div className="text-xs text-slate mt-1">Coming in Phase 2</div>
+          <div className="text-2xl font-medium text-yellow mt-1">{priorityTriggerCount ?? 0}</div>
+          <div className="text-xs text-slate mt-1">action ready</div>
         </div>
         <div className="rounded-xl bg-navy-card border border-[var(--border)] p-5 hover:border-[rgba(255,255,255,0.08)] transition-colors">
           <div className="text-[10px] tracking-wider uppercase text-slate-dim font-medium">Entering 5–7 Yr Window</div>
-          <div className="text-2xl font-medium text-yellow mt-1">—</div>
+          <div className="text-2xl font-medium text-yellow mt-1">{entering5to7Count ?? 0}</div>
           <div className="text-xs text-slate mt-1">clients flagged</div>
         </div>
       </div>
@@ -155,7 +163,7 @@ export default function Dashboard() {
                       </span>
                     </div>
                     <Link
-                      to="/touchpoints/compose"
+                      to={t.homeownerId ? `/touchpoints/compose?homeownerId=${t.homeownerId}` : '/touchpoints/compose'}
                       className="shrink-0 px-3 py-1.5 rounded-lg bg-yellow border border-yellow text-xs font-medium text-navy hover:bg-gold-light hover:border-gold-light transition-all no-underline"
                     >
                       Review & Send

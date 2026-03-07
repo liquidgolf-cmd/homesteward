@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
+import { deriveSuggestedTouchpoints } from '@/lib/suggestedTouchpoints'
 
 const FILTERS = ['All', 'Priority', 'New', 'RSVP']
 
@@ -15,18 +16,29 @@ export default function Touchpoints() {
   useEffect(() => {
     if (!agentId) return
     let cancelled = false
-    getDocs(
-      query(
-        collection(db, 'agents', agentId, 'touchpoints'),
-        orderBy('scheduledFor', 'asc'),
-        limit(50)
-      )
-    )
-      .then((snap) => {
-        if (!cancelled) setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-      })
-      .catch(() => { if (!cancelled) setItems([]) })
-      .finally(() => { if (!cancelled) setLoading(false) })
+    async function load() {
+      try {
+        const [tpSnap, homeSnap, txSnap] = await Promise.all([
+          getDocs(query(collection(db, 'agents', agentId, 'touchpoints'), orderBy('scheduledFor', 'asc'), limit(50))),
+          getDocs(query(collection(db, 'agents', agentId, 'homeowners'), orderBy('createdAt', 'desc'))),
+          getDocs(collection(db, 'agents', agentId, 'transactions')),
+        ])
+        if (cancelled) return
+        const tpDocs = tpSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        if (tpDocs.length > 0) {
+          setItems(tpDocs)
+        } else {
+          const homeowners = homeSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+          const transactions = txSnap.docs.map((d) => ({ ...d.data(), homeownerId: d.data().homeownerId }))
+          setItems(deriveSuggestedTouchpoints(homeowners, transactions))
+        }
+      } catch {
+        if (!cancelled) setItems([])
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
     return () => { cancelled = true }
   }, [agentId])
 
@@ -60,13 +72,13 @@ export default function Touchpoints() {
         </p>
       ) : (
         <div className="space-y-4">
-          {items.map((t) => (
-            <div key={t.id} className="rounded-xl border border-[var(--border)] bg-navy-card p-5">
-              <p className="font-medium text-white">{t.homeownerId || '—'}</p>
-              <p className="text-sm text-slate mt-0.5">{t.type || '—'}</p>
+          {items.map((t, i) => (
+            <div key={t.id || i} className="rounded-xl border border-[var(--border)] bg-navy-card p-5">
+              <p className="font-medium text-white">{t.homeownerName || t.homeownerId || '—'}</p>
+              <p className="text-sm text-slate mt-0.5">{t.reason || t.type || '—'}</p>
               <div className="mt-4">
                 <Link
-                  to="/touchpoints/compose"
+                  to={t.homeownerId ? `/touchpoints/compose?homeownerId=${t.homeownerId}` : '/touchpoints/compose'}
                   className="inline-block rounded-lg bg-gold px-4 py-2 text-sm font-medium text-navy hover:bg-gold-light no-underline"
                 >
                   Review & send

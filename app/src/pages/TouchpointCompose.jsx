@@ -1,6 +1,27 @@
-import { useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useCallback, useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import { useAuth } from '@/contexts/AuthContext'
+
+function formatDate(d) {
+  if (!d) return '—'
+  const s = typeof d === 'string' ? d : (d?.toDate?.()?.toISOString?.() || '')
+  if (!s) return '—'
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (!m) return s.slice(0, 4) || '—'
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${months[parseInt(m[2], 10) - 1]} ${m[1]}`
+}
+
+function yearsOwned(closingDate) {
+  if (!closingDate) return null
+  const s = typeof closingDate === 'string' ? closingDate : (closingDate?.toDate?.()?.toISOString?.() || '')
+  const d = new Date(s)
+  if (isNaN(d.getTime())) return null
+  const years = (new Date() - d) / (365.25 * 24 * 60 * 60 * 1000)
+  return years >= 0 ? `${years.toFixed(1)} yrs` : null
+}
 
 const PREFILL = `Quick note — homes near your area saw a small uptick this quarter. If you're curious what that means for yours, I'm happy to run a quick look — no pressure.`
 
@@ -49,7 +70,11 @@ function pickVariations(pool, count = 3) {
 }
 
 export default function TouchpointCompose() {
-  const { user } = useAuth()
+  const { user, agentId } = useAuth()
+  const [searchParams] = useSearchParams()
+  const homeownerId = searchParams.get('homeownerId')
+  const [clientData, setClientData] = useState(null)
+  const [clientLoading, setClientLoading] = useState(!!homeownerId)
   const [message, setMessage] = useState(PREFILL)
   const [channel, setChannel] = useState('push')
   const [tone, setTone] = useState('warm')
@@ -58,6 +83,73 @@ export default function TouchpointCompose() {
   const [aiVariations, setAiVariations] = useState(() => pickVariations(AI_VARIATIONS.warm))
   const [regenerating, setRegenerating] = useState(false)
   const [previewOverride, setPreviewOverride] = useState(null)
+
+  useEffect(() => {
+    if (!agentId || !homeownerId) {
+      setClientLoading(false)
+      setClientData(null)
+      return
+    }
+    let cancelled = false
+    async function load() {
+      setClientLoading(true)
+      try {
+        const [homeSnap, propSnap, txSnap] = await Promise.all([
+          getDoc(doc(db, 'agents', agentId, 'homeowners', homeownerId)),
+          getDocs(query(collection(db, 'agents', agentId, 'properties'), where('homeownerId', '==', homeownerId))),
+          getDocs(query(collection(db, 'agents', agentId, 'transactions'), where('homeownerId', '==', homeownerId))),
+        ])
+        if (cancelled) return
+        if (!homeSnap.exists()) {
+          setClientData(null)
+          return
+        }
+        const h = { id: homeSnap.id, ...homeSnap.data() }
+        const prop = propSnap.docs[0] ? { id: propSnap.docs[0].id, ...propSnap.docs[0].data() } : null
+        const tx = txSnap.docs[0] ? txSnap.docs[0].data() : null
+        const name = [h.firstName, h.lastName].filter(Boolean).join(' ') || 'Client'
+        const initials = [h.firstName, h.lastName].map((n) => (n || '')[0]).join('').toUpperCase().slice(0, 2) || '—'
+        const address = prop ? [prop.addressLine1, prop.city, prop.state, prop.zip].filter(Boolean).join('\n') : '—'
+        const tags = [
+          { label: '5-7 Yr Window', type: 'gold' },
+          ...(h.goals?.type ? [{ label: h.goals.type, type: 'green' }] : []),
+        ]
+        setClientData({
+          name,
+          address,
+          initials: initials || '—',
+          tags,
+          homeValue: prop?.lastAvmValue != null ? `$${Number(prop.lastAvmValue).toLocaleString()}` : '—',
+          equity: '—',
+          closingDate: formatDate(tx?.closingDate),
+          yearsOwned: yearsOwned(tx?.closingDate) || '—',
+          goalType: h.goals?.type || '—',
+          goalText: h.notes || '',
+          trigger: 'Ownership year 5–7 window — historically highest move-intent period.',
+        })
+      } catch {
+        if (!cancelled) setClientData(null)
+      } finally {
+        if (!cancelled) setClientLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [agentId, homeownerId])
+
+  const client = clientData || {
+    name: 'Sarah Johnson',
+    address: '423 Birchwood Ln\nDenver, CO 80206',
+    initials: 'SJ',
+    tags: [{ label: '5-Year Milestone', type: 'gold' }, { label: 'Equity +12%', type: 'green' }, { label: 'Move Window', type: 'amber' }],
+    homeValue: '$638K',
+    equity: '$184K',
+    closingDate: 'Jun 2019',
+    yearsOwned: '6.7 yrs',
+    goalType: 'Upgrade in 3–5 years',
+    goalText: '"Would love a bigger kitchen and a yard for the dog. Not in a rush — watching the market."',
+    trigger: '3 homes sold on her block in the last 30 days. Equity crossed 30% threshold. Ownership year 5–7 window — historically highest move-intent period.',
+  }
 
   const agentName = user?.displayName || 'Mike Smith'
   const previewText = previewOverride ?? message
@@ -116,6 +208,10 @@ export default function TouchpointCompose() {
       <div className="flex-1 flex min-h-0 overflow-hidden">
         {/* Left: Client context */}
         <div className="w-[320px] shrink-0 border-r border-[var(--border-soft)] overflow-y-auto p-6 space-y-6">
+          {clientLoading ? (
+            <p className="text-slate text-sm">Loading client…</p>
+          ) : (
+          <>
           <div>
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold-dim to-gold flex items-center justify-center font-heading text-xl font-semibold text-navy mb-3">
               {client.initials}
@@ -193,12 +289,14 @@ export default function TouchpointCompose() {
               <div className="flex gap-2">
                 <div className="w-2 h-2 rounded-full bg-slate-dim shrink-0 mt-1.5" />
                 <div>
-                  <div className="text-[12px] text-white-dim">Closed — 423 Birchwood Ln</div>
-                  <div className="text-[10px] text-slate-dim">Jun 12, 2019</div>
+                  <div className="text-[12px] text-white-dim">Closed — {client.address?.split('\n')[0] || '—'}</div>
+                  <div className="text-[10px] text-slate-dim">{client.closingDate}</div>
                 </div>
               </div>
             </div>
           </div>
+          </>
+          )}
         </div>
 
         {/* Center: Compose */}
