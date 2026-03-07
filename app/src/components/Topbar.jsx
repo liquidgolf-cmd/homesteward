@@ -20,8 +20,9 @@ function formatDate() {
 
 export default function Topbar() {
   const { user, agentId } = useAuth()
-  const { avmUsed, avmQuota } = useAgentStats(agentId)
-  const firstName = user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'there'
+  const { agent, avmUsed, avmQuota } = useAgentStats(agentId)
+  const raw = agent?.name?.split(' ')[0] || user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'there'
+  const firstName = raw?.includes('@') ? raw.split('@')[0] : raw
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between px-9 py-5 border-b border-[var(--border-soft)] bg-navy">
