@@ -67,7 +67,15 @@ export default function Clients() {
     const q = searchQuery.trim().toLowerCase()
     let list = q
       ? homeowners.filter((h) => {
-          const searchable = [h.firstName, h.lastName, h.email, h.phone, h.address].filter(Boolean).join(' ').toLowerCase()
+          const searchable = [
+            h.firstName,
+            h.lastName,
+            h.email,
+            h.phone,
+            h.address,
+            h.notes,
+            h.goals?.type,
+          ].filter(Boolean).join(' ').toLowerCase()
           return searchable.includes(q)
         })
       : [...homeowners]
@@ -211,7 +219,12 @@ export default function Clients() {
                       className="border-b border-[var(--border-soft)] last:border-0 hover:bg-navy-hover transition-colors"
                     >
                       <td className="px-5 py-3">
-                        <span className="font-medium text-white">{name}</span>
+                        <Link
+                          to={`/clients/${h.id}`}
+                          className="font-medium text-white hover:text-yellow no-underline"
+                        >
+                          {name}
+                        </Link>
                       </td>
                       <td className="px-5 py-3 text-sm text-slate">{h.email || '—'}</td>
                       <td className="px-5 py-3 text-sm text-slate hidden md:table-cell">{h.phone || '—'}</td>
