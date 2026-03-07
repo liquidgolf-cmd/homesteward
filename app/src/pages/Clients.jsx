@@ -233,12 +233,20 @@ export default function Clients() {
                       </td>
                       <td className="px-5 py-3 text-sm text-slate-dim">{formatDate(h.closingDate)}</td>
                       <td className="px-5 py-3">
-                        <Link
-                          to={`/touchpoints/compose?homeownerId=${h.id}`}
-                          className="text-xs text-yellow hover:text-gold-light no-underline"
-                        >
-                          Touchpoint
-                        </Link>
+                        <div className="flex gap-3">
+                          <Link
+                            to={`/clients/${h.id}`}
+                            className="text-xs text-yellow hover:text-gold-light no-underline"
+                          >
+                            Edit
+                          </Link>
+                          <Link
+                            to={`/touchpoints/compose?homeownerId=${h.id}`}
+                            className="text-xs text-yellow hover:text-gold-light no-underline"
+                          >
+                            Touchpoint
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   )
