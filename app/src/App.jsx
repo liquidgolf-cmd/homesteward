@@ -14,6 +14,7 @@ import AVMMeter from '@/pages/AVMMeter'
 import EventCreator from '@/pages/EventCreator'
 import HomeownerPortal from '@/pages/HomeownerPortal'
 import Placeholder from '@/pages/Placeholder'
+import Clients from '@/pages/Clients'
 
 export default function App() {
   return (
@@ -34,7 +35,7 @@ export default function App() {
             <Route path="create-event" element={<EventCreator />} />
             <Route path="homeowner" element={<HomeownerPortal />} />
             <Route path="triggers" element={<Placeholder title="Priority Triggers" />} />
-            <Route path="clients" element={<Placeholder title="All Clients" />} />
+            <Route path="clients" element={<Clients />} />
             <Route path="equity-map" element={<Placeholder title="Equity Map" />} />
             <Route path="settings" element={<Placeholder title="Settings" />} />
           </Route>

@@ -287,6 +287,12 @@ export default function Import() {
           </span>
         </label>
         <p className="text-[11px] text-slate-dim tracking-wide">Files are processed in your browser. We do not store the file.</p>
+        <p className="text-xs text-slate mt-4">
+          <a href="/sample-past-clients.csv" download className="text-yellow hover:text-gold-light no-underline">
+            Download sample CSV (20 past clients)
+          </a>
+          {' '}to test the import flow.
+        </p>
         <div className="grid grid-cols-2 gap-3 my-7">
           <div className="rounded-xl bg-navy-card border border-[var(--border-soft)] p-5 flex items-center gap-3 hover:border-[rgba(201,168,76,0.25)] hover:bg-navy-hover transition-colors cursor-pointer">
             <span className="text-2xl">🔗</span>
