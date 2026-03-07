@@ -57,8 +57,10 @@ export default function TouchpointCompose() {
   const [sent, setSent] = useState(false)
   const [aiVariations, setAiVariations] = useState(() => pickVariations(AI_VARIATIONS.warm))
   const [regenerating, setRegenerating] = useState(false)
+  const [previewOverride, setPreviewOverride] = useState(null)
 
   const agentName = user?.displayName || 'Mike Smith'
+  const previewText = previewOverride ?? message
 
   const handleRegenerate = useCallback(() => {
     setRegenerating(true)
@@ -75,7 +77,7 @@ export default function TouchpointCompose() {
   }
 
   const handleUseVariation = (text) => {
-    setMessage(text)
+    setPreviewOverride(text)
   }
 
   const handleSend = () => {
@@ -84,7 +86,7 @@ export default function TouchpointCompose() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(message)
+      await navigator.clipboard.writeText(previewText)
     } catch {}
   }
 
@@ -258,7 +260,10 @@ export default function TouchpointCompose() {
               <textarea
                 rows={6}
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => {
+                  setMessage(e.target.value)
+                  setPreviewOverride(null)
+                }}
                 className="w-full rounded-lg bg-navy-light border border-[var(--border-soft)] px-3 py-2.5 text-sm text-white placeholder-slate-dim focus:border-gold-dim focus:outline-none resize-y min-h-[120px]"
                 placeholder="Write a short, helpful note."
               />
@@ -305,7 +310,7 @@ export default function TouchpointCompose() {
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-slate-dim mt-2">Click a variation to use it in the message above.</p>
+              <p className="text-[11px] text-slate-dim mt-2">Click a variation to see it in Live Preview.</p>
             </div>
           </div>
         </div>
@@ -317,7 +322,7 @@ export default function TouchpointCompose() {
             <div className="text-xs text-slate mb-2">{channel === 'push' ? 'Push Notification' : channel === 'sms' ? 'SMS' : 'Email'}</div>
             <div className="rounded-xl bg-navy-card border border-[var(--border)] p-4">
               <div className="text-xs text-white-dim font-medium mb-1">{agentName}</div>
-              <div className="text-[11px] text-slate line-clamp-3">{message.slice(0, 120)}{message.length > 120 ? '…' : ''}</div>
+              <div className="text-[11px] text-slate line-clamp-3">{previewText.slice(0, 120)}{previewText.length > 120 ? '…' : ''}</div>
               {includeLink && <div className="mt-2 text-[10px] text-gold" title="Link to personalized value report (mockup)">Learn more</div>}
             </div>
           </div>
